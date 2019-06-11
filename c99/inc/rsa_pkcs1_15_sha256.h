@@ -5,7 +5,7 @@
 #define DIGEST_LEN 32
 
 #include "min-bn-math.h"
-#include "min-bn-io.h"
+//#include "min-bn-io.h"
 #define N_BYTE_LENGTH (BN_SAFE_WIDTH/8)
 
 //return 0 if sig match

@@ -1,6 +1,7 @@
 #ifndef __RSA_PKCS1_15_SHA256_H__
 #define __RSA_PKCS1_15_SHA256_H__
 
+#define SHA256_ONLY_LE
 #include "sha256.h"
 #define DIGEST_LEN 32
 
@@ -12,12 +13,12 @@
 static int rsa_verify_pkcs1_15_sha256(
     const void*const message,
     uint16_t size,
-    const WORD*const sig,
-    WORD e[BN_WORDS],
-    WORD n[BN_WORDS]
+    const BN_WORD*const sig,
+    BN_WORD e[BN_WORDS],
+    BN_WORD n[BN_WORDS]
 ){
-    WORD x[BN_WORDS] = {0};
-    WORD y[BN_WORDS];
+    BN_WORD x[BN_WORDS] = {0};
+    BN_WORD y[BN_WORDS];
 
     sha256_sum_little(message,size,x);
     const uint8_t pad[] = {
@@ -33,7 +34,7 @@ static int rsa_verify_pkcs1_15_sha256(
     memset(x8+ffpadoffset,0xFF,N_BYTE_LENGTH-2-ffpadoffset);
     x8[N_BYTE_LENGTH-2]=0x01;
     x8[N_BYTE_LENGTH-1]=0x00;
-    //printf("\nsizeof(WORD)=%lu\n\n",sizeof(WORD));
+    //printf("\nsizeof(BN_WORD)=%lu\n\n",sizeof(BN_WORD));
     //bn_dumphex("e=",e);
     //bn_dumphex("n=",n);
     //bn_dumphex("sig=",sig);

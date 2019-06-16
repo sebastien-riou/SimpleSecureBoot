@@ -173,6 +173,7 @@ static void sha256_final(SHA256_CTX *ctx, uint8_t hash[], unsigned int little){
     }
 }
 
+#ifndef SHA256_ONLY_LE
 static void sha256_sum(const void* dat, size_t len, void* const hash){
     const uint8_t*const data=dat;
     uint8_t* const hash8=hash;
@@ -182,6 +183,9 @@ static void sha256_sum(const void* dat, size_t len, void* const hash){
     sha256_update(h,data,len);
     sha256_final(h,hash8,0);
 }
+#endif
+
+#ifndef SHA256_ONLY_BE
 static void sha256_sum_little(const void* dat, size_t len, void* const hash){
     const uint8_t*const data=dat;
     uint8_t* const hash8=hash;
@@ -191,4 +195,5 @@ static void sha256_sum_little(const void* dat, size_t len, void* const hash){
     sha256_update(h,data,len);
     sha256_final(h,hash8,1);
 }
+#endif
 #endif

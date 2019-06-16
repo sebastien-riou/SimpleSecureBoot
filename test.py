@@ -13,6 +13,6 @@ def test(start,size,ihex,key):
     subprocess.run(cmd,check=True)
 
 for size in ['0x200','0x4000']:
-    for key in ['key1024','key2048','key4096']:
+    for key in ['key512','key1024','key2048','key4096']:
         test('0', size, 'test.ihex',key)
         print()

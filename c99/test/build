@@ -2,7 +2,7 @@
 
 rm -f a.out
 
-gcc -I . -I ../inc -DSSB_KEY_LENGTH=$1 -DBUF_SIZE=$2 test.c
-gcc -I . -I ../inc mysha256sum.c -o mysha256sum
+gcc --std=c99 -Wall -Werror -I . -I ../inc -DSSB_KEY_LENGTH=$1 -DBUF_SIZE=$2 test.c
+gcc --std=c99 -I . -I ../inc mysha256sum.c -o mysha256sum
 
 ./a.out

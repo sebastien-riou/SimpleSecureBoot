@@ -9,11 +9,11 @@
 #define BYTES_PER_LINE 16
 
 int main(int argc, char*argv[]){
+    (void)bytes_utils_remove_unused_warnings;
     char *ihex = "../../test.ihex.signed.ihex";
     uint8_t mem[BUF_SIZE];
-    WORD sig[BN_WORDS]={0};
+    BN_WORD sig[BN_WORDS]={0};
     uint8_t *sig8 = (uint8_t*)&sig;
-    WORD computed_sig[BN_WORDS]={0};
     FILE * fp;
     char * line = NULL;
     size_t len = 0;

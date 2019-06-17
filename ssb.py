@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import sys
-#from Crypto.Hash import SHA256
 import runpy
 from intelhex import IntelHex
 from rsa_pkcs1_15_sha256 import *
@@ -59,13 +58,13 @@ for i in range(0,len(sig_bytes)):
     iho[start_addr+size+i] = sig_bytes[i]
 
 iho.write_hex_file(ihexf+".signed.ihex")
-
+sys.stdout.flush()  
 try:
-    #sanity check using C99 code
     test_path=os.path.abspath(os.path.join(os.path.dirname(__file__),'c99','test'))
-    build_path=os.path.join(test_path,'build')
-    cmd = [ build_path, "%d"%key_size, "%d"%size ]
-    subprocess.run(cmd,check=True,cwd=test_path)
+    build_path=os.path.join(test_path,'build.py')
+    cmd = [ sys.executable, build_path, "%d"%key_size, "%d"%size, os.path.abspath(ihexf+".signed.ihex") ]
+    print(' '.join(cmd))
+    subprocess.run(cmd,check=True,cwd=test_path, shell=False)
 except:
     print()
     #print n as a C array of 32 bit words

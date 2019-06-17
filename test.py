@@ -10,6 +10,7 @@ ssb_path=os.path.abspath(os.path.join(os.path.dirname(__file__),'ssb.py'))
 def test(start,size,ihex,key):
     cmd = [ sys.executable, 'ssb.py',start,size,ihex,key]
     print(' '.join(cmd))
+    sys.stdout.flush()  
     subprocess.run(cmd,check=True)
 
 for size in ['0x200','0x4000']:

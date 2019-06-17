@@ -3,9 +3,12 @@
 #Python model for RSA SIGN/VERIFY PKCS1_V1_5 with SHA256
 #Following https://tools.ietf.org/html/rfc8017
 
-from Crypto.Hash import SHA256
-import sys
+try:
+    from Crypto.Hash import SHA256
+except:
+    from Cryptodome.Hash import SHA256
 
+import sys
 
 def bytes_length(x):
     return (x.bit_length() + 7) // 8

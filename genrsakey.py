@@ -6,19 +6,36 @@ import sys
 import binascii
 import struct
 
-from Crypto import Random
-from Crypto.IO import PKCS8, PEM
-from Crypto.Util.py3compat import tobytes, bord, tostr
-from Crypto.Util.asn1 import DerSequence
+try:
+    from Crypto import Random
+    from Crypto.IO import PKCS8, PEM
+    from Crypto.Util.py3compat import tobytes, bord, tostr
+    from Crypto.Util.asn1 import DerSequence
 
-from Crypto.Math.Numbers import Integer
-from Crypto.Math.Primality import (test_probable_prime,
-                                   generate_probable_prime, COMPOSITE)
+    from Crypto.Math.Numbers import Integer
+    from Crypto.Math.Primality import (test_probable_prime,
+                                       generate_probable_prime, COMPOSITE)
 
-from Crypto.PublicKey import (_expand_subject_public_key_info,
-                              _create_subject_public_key_info,
-                              _extract_subject_public_key_info)
+    from Crypto.PublicKey import (_expand_subject_public_key_info,
+                                  _create_subject_public_key_info,
+                                  _extract_subject_public_key_info)
 
+
+    from Crypto.PublicKey import RSA
+except:
+    from Cryptodome import Random
+    from Cryptodome.IO import PKCS8, PEM
+    from Cryptodome.Util.py3compat import tobytes, bord, tostr
+    from Cryptodome.Util.asn1 import DerSequence
+    from Cryptodome.Math.Numbers import Integer
+    from Cryptodome.Math.Primality import (test_probable_prime,
+                                       generate_probable_prime, COMPOSITE)
+    from Cryptodome.PublicKey import (_expand_subject_public_key_info,
+                                  _create_subject_public_key_info,
+                                  _extract_subject_public_key_info)
+    from Cryptodome.PublicKey import RSA
+                             
+                              
 def generate_probable_prime(**kwargs):
     """Generate a random probable prime.
     The prime will not have any specific properties
@@ -121,10 +138,6 @@ def generate(bits, randfunc=None, e=65537):
     u = p.inverse(q)
 
     return RSA.RsaKey(n=n, e=e, d=d, p=p, q=q, u=u)
-
-
-
-from Crypto.PublicKey import RSA
 
 if (len(sys.argv) > 3) | (len(sys.argv) < 0) :
     print("ERROR: incorrect arguments")

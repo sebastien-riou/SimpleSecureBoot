@@ -18,7 +18,9 @@ static int rsa_verify_pkcs1_15_sha256(
     BN_WORD n[BN_WORDS]
 ){
     BN_WORD x[BN_WORDS] = {0};
-    BN_WORD y[BN_WORDS];
+    BN_WORD y[BN_WORDS] = {0};
+    BN_WORD safe_sig[BN_WORDS] = {0};
+    memcpy(safe_sig,sig,N_BYTE_LENGTH);
 
     sha256_sum_little(message,size,x);
     const uint8_t pad[] = {
@@ -37,8 +39,8 @@ static int rsa_verify_pkcs1_15_sha256(
     //printf("\nsizeof(BN_WORD)=%lu\n\n",sizeof(BN_WORD));
     //bn_dumphex("e=",e);
     //bn_dumphex("n=",n);
-    //bn_dumphex("sig=",sig);
-    bn_modexp(y, sig,e,n);
+    //bn_dumphex("sig=",safe_sig);
+    bn_modexp(y, safe_sig,e,n);
     int status = memcmp(y,x,sizeof(y));
     //bn_dumphex("y=",y);
     //if(status){

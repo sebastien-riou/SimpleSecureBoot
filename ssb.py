@@ -33,7 +33,7 @@ print("Signing %d bytes using %d bits RSA key"%(size,key_size))
 
 #restrict alignements to ease the implementation on device side
 assert(0 == (start_addr % 32))
-assert(0 == (size % 32))
+assert(0 == ((size+4) % 32))
 
 message_bytes = bytearray()
 for addr in range(start_addr,start_addr+size):
@@ -42,6 +42,24 @@ for addr in range(start_addr,start_addr+size):
     message_bytes.append(b)
     #print("%04X %02X "%(addr,b))
 
+#append the start address info on 4 bytes, little endian    
+if ih.start_addr is None:
+    print("ERROR: no start address defined in the hex file")
+    exit(-1)
+    
+try:
+    start=ih.start_addr['EIP']
+except:
+    start=ih.start_addr['IP']+(ih.start_addr['CS']<<4)
+#print(ih.start_addr)
+#print("start=0x%08x"%start)
+start_bytes = start.to_bytes(4,byteorder='little')
+for i in range(0,4):
+    b=start_bytes[i]
+    iho[start_addr+size+i]=b
+    message_bytes.append(b)
+size+=4
+    
 sig_bytes=RSA_SIGN_PKCS1_V1_5_SHA256(message_bytes,d,n)
 sig = int.from_bytes(sig_bytes,byteorder='little')
 #print("signature: 0x%x"%sig)
@@ -57,6 +75,7 @@ sig_bytes = sig.to_bytes(bytes_length(n),byteorder='little')
 for i in range(0,len(sig_bytes)):
     iho[start_addr+size+i] = sig_bytes[i]
 
+ 
 iho.write_hex_file(ihexf+".signed.ihex")
 sys.stdout.flush()  
 try:

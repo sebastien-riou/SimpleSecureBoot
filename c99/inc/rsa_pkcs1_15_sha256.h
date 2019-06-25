@@ -5,8 +5,9 @@
 #include "sha256.h"
 #define DIGEST_LEN 32
 
+
+//#define BN_MATH_DEBUG
 #include "min-bn-math.h"
-//#include "min-bn-io.h"
 #define N_BYTE_LENGTH (BN_SAFE_WIDTH/8)
 
 //return 0 if sig match
@@ -14,9 +15,13 @@ static int rsa_verify_pkcs1_15_sha256(
     const void*const message,
     uint16_t size,
     const BN_WORD*const sig,
-    BN_WORD e[BN_WORDS],
-    BN_WORD n[BN_WORDS]
+    const BN_WORD e[BN_WORDS],
+    const BN_WORD n[BN_WORDS],
+    const BN_WORD R[BN_WORDS],
+    const BN_WORD R2[BN_WORDS],
+    unsigned int mp
 ){
+    (void)bn_remove_unused_warnings;
     BN_WORD x[BN_WORDS] = {0};
     BN_WORD y[BN_WORDS] = {0};
     BN_WORD safe_sig[BN_WORDS] = {0};
@@ -36,20 +41,24 @@ static int rsa_verify_pkcs1_15_sha256(
     memset(x8+ffpadoffset,0xFF,N_BYTE_LENGTH-2-ffpadoffset);
     x8[N_BYTE_LENGTH-2]=0x01;
     x8[N_BYTE_LENGTH-1]=0x00;
-    //printf("\nsizeof(BN_WORD)=%lu\n\n",sizeof(BN_WORD));
-    //bn_dumphex("e=",e);
-    //bn_dumphex("n=",n);
-    //bn_dumphex("sig=",safe_sig);
-    bn_modexp(y, safe_sig,e,n);
+    #ifdef BN_MATH_DEBUG
+        printf("\nsizeof(BN_WORD)=%lu\n\n",sizeof(BN_WORD));
+        bn_dumphex("e=",e);
+        bn_dumphex("n=",n);
+        bn_dumphex("sig=",safe_sig);
+    #endif
+    bn_modexp_montgommery(y, safe_sig,e,n,R,R2,mp);
     int status = memcmp(y,x,sizeof(y));
-    //bn_dumphex("y=",y);
-    //if(status){
-    //    printf("sig mismatch:\n");
-    //    println_bytes("computed digest:  ",x,sizeof(x));
-    //    println_bytes("decrypted digest: ",y,sizeof(y));
-    //}else{
-    //    printf("sig match\n");
-    //}
+    #ifdef BN_MATH_DEBUG
+        bn_dumphex("y=",y);
+        if(status){
+            printf("sig mismatch:\n");
+            println_bytes("computed digest:  ",x,sizeof(x));
+            println_bytes("decrypted digest: ",y,sizeof(y));
+        }else{
+            printf("sig match\n");
+        }
+    #endif
     return status;
 }
 

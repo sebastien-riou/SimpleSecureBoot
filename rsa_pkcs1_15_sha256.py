@@ -9,6 +9,7 @@ except:
     from Cryptodome.Hash import SHA256
 
 import sys
+from montgommery_modexp import Montgommery
 
 def bytes_length(x):
     return (x.bit_length() + 7) // 8
@@ -37,9 +38,13 @@ def RSA_SIGN_PKCS1_V1_5_SHA256(message_bytes,d,n):
 def RSA_VERIFY_PKCS1_V1_5_SHA256(message_bytes,sig_bytes,e,n):
     k=bytes_length(n)
     em=EMSA_PKCS1_V1_5_ENCODE(message_bytes, k)
-    em2_int=pow(int.from_bytes(sig_bytes,byteorder='little'),e,n)
+    sig_int=int.from_bytes(sig_bytes,byteorder='little')
+    em2_int=pow(sig_int,e,n)
     em2 = em2_int.to_bytes(bytes_length(n),byteorder='big')
     assert(em==em2)
+    m=Montgommery(n)
+    em3_int=m.modexp(sig_int,e)
+    assert(em2_int==em3_int)
 
 if __name__ == "__main__":
     #test code

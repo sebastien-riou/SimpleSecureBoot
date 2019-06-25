@@ -10,6 +10,14 @@ import subprocess
 def bytes_length(x):
     return (x.bit_length() + 7) // 8
 
+def print_c99_array32(name,n,bitlength):
+    print("static const uint32_t %s[%d] = {"%(name,(bitlength+31)//32))
+    for i in range(0,bitlength,32):
+        print("0x%08X,"%(0xFFFFFFFF & (n>>i)),end="")
+        if 0==((i+32)%256):
+            print()
+    print("};")
+
 if (len(sys.argv) > 5) | (len(sys.argv) < 5) :
     print("ERROR: incorrect arguments")
     print("Usage:")
@@ -42,11 +50,11 @@ for addr in range(start_addr,start_addr+size):
     message_bytes.append(b)
     #print("%04X %02X "%(addr,b))
 
-#append the start address info on 4 bytes, little endian    
+#append the start address info on 4 bytes, little endian
 if ih.start_addr is None:
     print("ERROR: no start address defined in the hex file")
     exit(-1)
-    
+
 try:
     start=ih.start_addr['EIP']
 except:
@@ -59,7 +67,7 @@ for i in range(0,4):
     iho[start_addr+size+i]=b
     message_bytes.append(b)
 size+=4
-    
+
 sig_bytes=RSA_SIGN_PKCS1_V1_5_SHA256(message_bytes,d,n)
 sig = int.from_bytes(sig_bytes,byteorder='little')
 #print("signature: 0x%x"%sig)
@@ -75,9 +83,9 @@ sig_bytes = sig.to_bytes(bytes_length(n),byteorder='little')
 for i in range(0,len(sig_bytes)):
     iho[start_addr+size+i] = sig_bytes[i]
 
- 
+
 iho.write_hex_file(ihexf+".signed.ihex")
-sys.stdout.flush()  
+sys.stdout.flush()
 try:
     test_path=os.path.abspath(os.path.join(os.path.dirname(__file__),'c99','test'))
     build_path=os.path.join(test_path,'build.py')
@@ -88,11 +96,10 @@ except:
     print()
     #print n as a C array of 32 bit words
     print("static const uint32_t ssb_e = 0x%08X;"%e)
-    print("static const uint32_t ssb_n[%d] = {"%(key_size//32))
-    for i in range(0,key_size,32):
-        print("0x%08X,"%(0xFFFFFFFF & (n>>i)),end="")
-        if 0==((i+32)%256):
-            print()
-    print("};")
+    print_c99_array32("ssb_n",n,key_size+32)
+    from montgommery_modexp import Montgommery
+    m=Montgommery(n)
+    print_c99_array32("ssb_n_R",m.R,key_size+32)
+    print_c99_array32("ssb_n_R2",m.R2,key_size+32)
     print("\nERROR: C code needs update (most likely key don't match)\n")
     exit(-1)

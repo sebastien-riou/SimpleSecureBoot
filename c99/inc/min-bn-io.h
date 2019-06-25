@@ -6,7 +6,7 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-static void bn_dumphex(const char*const s, const WORD x[]){
+BN_FUNC void bn_dumphex(const char*const s, const BN_WORD x[]){
   printf("%s",s);
   for (int i=BN_WORDS-1; i>=0; i--){
     if(BN_WORD_WIDTH > 32){

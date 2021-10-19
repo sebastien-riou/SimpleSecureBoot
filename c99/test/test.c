@@ -109,7 +109,10 @@ int main(int argc, char*argv[]){
     if (line)
         free(line);
 
-    int status = ssb_check_sig(mem,BUF_SIZE,sig);
+    default_dat_reader_ctx_t c;
+    c.dat = mem;
+    c.size = BUF_SIZE;
+    int status = ssb_check_sig(default_dat_reader,&c,sig);
     if(status){
         printf("ERROR: sig mismatch\n");
     }else{

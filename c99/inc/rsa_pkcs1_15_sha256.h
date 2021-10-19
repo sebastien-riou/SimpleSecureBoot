@@ -1,7 +1,7 @@
 #ifndef __RSA_PKCS1_15_SHA256_H__
 #define __RSA_PKCS1_15_SHA256_H__
 
-#define SHA256_ONLY_LE
+#define SHA256_CALLBACK
 #include "sha256.h"
 #define DIGEST_LEN 32
 
@@ -12,8 +12,8 @@
 
 //return 0 if sig match
 static int rsa_verify_pkcs1_15_sha256(
-    const void*const message,
-    uint16_t size,
+    dat_reader_t dat_reader, 
+    void*dat_reader_ctx,
     const BN_WORD*const sig,
     const BN_WORD e[BN_WORDS],
     const BN_WORD n[BN_WORDS],
@@ -26,8 +26,9 @@ static int rsa_verify_pkcs1_15_sha256(
     BN_WORD y[BN_WORDS] = {0};
     BN_WORD safe_sig[BN_WORDS] = {0};
     memcpy(safe_sig,sig,N_BYTE_LENGTH);
+    
+    sha256_sum_callback(dat_reader,dat_reader_ctx,x);
 
-    sha256_sum_little(message,size,x);
     const uint8_t pad[] = {
         0x20,0x04,0x00,0x05,
         0x01,0x02,0x04,0x03,

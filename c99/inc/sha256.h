@@ -173,7 +173,7 @@ static void sha256_final(SHA256_CTX *ctx, uint8_t hash[], unsigned int little){
     }
 }
 
-#ifndef SHA256_ONLY_LE
+#ifdef SHA256_BE
 static void sha256_sum(const void* dat, size_t len, void* const hash){
     const uint8_t*const data=dat;
     uint8_t* const hash8=hash;
@@ -185,7 +185,7 @@ static void sha256_sum(const void* dat, size_t len, void* const hash){
 }
 #endif
 
-#ifndef SHA256_ONLY_BE
+#ifdef SHA256_LE
 static void sha256_sum_little(const void* dat, size_t len, void* const hash){
     const uint8_t*const data=dat;
     uint8_t* const hash8=hash;
@@ -194,6 +194,41 @@ static void sha256_sum_little(const void* dat, size_t len, void* const hash){
     sha256_init(h);
     sha256_update(h,data,len);
     sha256_final(h,hash8,1);
+}
+#endif
+
+#ifdef SHA256_CALLBACK
+typedef size_t (dat_reader_t)(void*,const void**);
+typedef struct default_dat_reader_ctx_struct {
+    const void*dat;
+    size_t size;
+} default_dat_reader_ctx_t;
+
+static size_t default_dat_reader(void*ctx, const void**dat){
+    default_dat_reader_ctx_t*c = (default_dat_reader_ctx_t*)ctx;
+    //printf("\ndefault_dat_reader ctx=%p\n",ctx);
+    *dat = c->dat;
+    size_t out = c->size;
+    //printf("default_dat_reader dat=%p, out=%lx\n",dat,out);
+    //fflush(stdout);
+    c->size=0;
+    return out;
+}
+
+static void sha256_sum_callback(dat_reader_t dat_reader, void*dat_reader_ctx, void* const hash){
+    uint8_t* const hash8=hash;
+    SHA256_CTX h_ctx;
+    SHA256_CTX *h = &h_ctx;
+    sha256_init(h);
+	const void* dat;
+	size_t size;
+	while((size=dat_reader(dat_reader_ctx, &dat))){
+		const uint8_t*const data=dat;
+		//printf("sha256 update dat=%p, size=%lx\n",dat,size);
+    	//fflush(stdout);
+    	sha256_update(h,data,size);
+	}
+	sha256_final(h,hash8,1);
 }
 #endif
 #endif

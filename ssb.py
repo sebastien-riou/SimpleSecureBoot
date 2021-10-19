@@ -22,7 +22,7 @@ if (len(sys.argv) > 5) | (len(sys.argv) < 5) :
     print("ERROR: incorrect arguments")
     print("Usage:")
     print("ssb.py <start addr> <size> <ihex file> <RSA key file>")
-    exit()
+    exit(-1)
 
 start_addr = int(sys.argv[1],0)
 size = int(sys.argv[2],0)
@@ -89,7 +89,7 @@ sys.stdout.flush()
 try:
     test_path=os.path.abspath(os.path.join(os.path.dirname(__file__),'c99','test'))
     build_path=os.path.join(test_path,'build.py')
-    cmd = [ sys.executable, build_path, "%d"%key_size, "%d"%size, os.path.abspath(ihexf+".signed.ihex") ]
+    cmd = [ sys.executable, build_path, "%d"%key_size, "%d"%size, os.path.abspath(ihexf+".signed.ihex"), 'test' ]
     print(' '.join(cmd))
     subprocess.run(cmd,check=True,cwd=test_path, shell=False)
 except:

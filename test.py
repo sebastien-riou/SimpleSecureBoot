@@ -13,7 +13,17 @@ def test(start,size,ihex,key):
     sys.stdout.flush()  
     subprocess.run(cmd,check=True)
 
+def testssbl(load_addr,ihex,key):
+    cmd = [ sys.executable, 'ssbl.py',load_addr,ihex,key]
+    print(' '.join(cmd))
+    sys.stdout.flush()  
+    subprocess.run(cmd,check=True)
+
+
+testssbl('0','test.ihex','key512')
+
 for size in ['0x1FC','0x3FFC']:
     for key in ['key512','key1024','key2048','key4096']:
         test('0', size, 'test.ihex',key)
         print()
+

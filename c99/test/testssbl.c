@@ -71,13 +71,14 @@ int main(int argc, char*argv[]){
     uint8_t *dat=(uint8_t*)imagebuf;
     printf("get data\n");
     while ((read = getline(&line, &len, fp)) != -1) {
-        if(read>12){
+        if(read>12 && line[8]=='0'){
             char *hexstr = line+9;
             hexstr[BYTES_PER_LINE*2]=0;
             //printf("%s\n", hexstr);
             unsigned int nbytes = (read-12)/2;
             hexstr_to_bytes(dat,nbytes,hexstr);
-            println_128("",dat);
+            if(dat-(uint8_t*)imagebuf < 128)
+                println_128("",dat);
             assert(dat-(uint8_t*)imagebuf + nbytes <= sizeof(imagebuf));
             dat+=nbytes;
         }else{

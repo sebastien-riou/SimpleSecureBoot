@@ -100,7 +100,7 @@ print(len(message_bytes))
 print(total_size)
 assert(len(message_bytes)==total_size)
 
-print(Utils.hexstr(message_bytes))
+#print(Utils.hexstr(message_bytes))
 
 iho = IntelHex()
 for i in range(0,total_size):
@@ -114,7 +114,7 @@ sys.stdout.flush()
 try:
     test_path=os.path.abspath(os.path.join(os.path.dirname(__file__),'c99','test'))
     build_path=os.path.join(test_path,'build.py')
-    cmd = [ sys.executable, build_path, "%d"%(key_size*8), "%d"%size, os.path.abspath(ihexf+".ssbl.ihex"), 'testssbl' ]
+    cmd = [ sys.executable, build_path, "%d"%(key_size*8), "%d"%total_size, os.path.abspath(ihexf+".ssbl.ihex"), 'testssbl' ]
     print(' '.join(cmd))
     subprocess.run(cmd,check=True,cwd=test_path, shell=False)
 except:

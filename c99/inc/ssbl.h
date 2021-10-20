@@ -27,7 +27,10 @@ static uint64_t ssbl_read64(){
     return out;
 }
 static void ssbl_mem_write64(uint64_t*addr, uint64_t dat){
-    *addr = dat;
+    *addr = dat;//opportunity to write in another way
+}
+static const uint64_t*const ssbl_mem_readbuf(const uint64_t* const addr){
+    return addr;//opportunity to do read address translation
 }
 #endif
 
@@ -61,7 +64,7 @@ static size_t ssbl_dat_reader(void*ctx, const void**dat){
             c->state=1;
             break;
         case 1:
-            *dat = c->dat;
+            *dat = ssbl_mem_readbuf(c->dat);
             out = c->data_size;
             c->state=2;
             break;
@@ -69,8 +72,8 @@ static size_t ssbl_dat_reader(void*ctx, const void**dat){
             out=0;
             break;
     }
-    //printf("dat_reader dat=%p, out=%lx\n",dat,out);
-    //fflush(stdout);
+    printf("dat_reader dat=%p, out=%lx\n",dat,out);
+    fflush(stdout);
     return out;
 }
 

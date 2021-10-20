@@ -12,16 +12,20 @@ static uint64_t ssbl_read64(){
     return imagebuf[offset++];
 }
 uint64_t membuf[BUF_SIZE];
+static uint64_t membuf_base=0;
 static void ssbl_mem_write64(uint64_t*addr, uint64_t dat){
     static unsigned int offset=0;
-    static uint64_t base=0;
     uint64_t addr64 = (uint64_t)addr;
-    if(0==offset) base = addr64;
+    if(0==offset) membuf_base = addr64;
     printf("write %016lx at %08lx\n",dat,addr64);
-    assert(offset == (addr64-base)/sizeof(uint64_t));
+    assert(offset == (addr64-membuf_base)/sizeof(uint64_t));
     membuf[offset++] = dat;
 }
-
+static const uint64_t* const ssbl_mem_readbuf(const uint64_t*const addr){
+    uint64_t addr64 = (uint64_t)addr;
+    unsigned int offset = (addr64-membuf_base)/sizeof(uint64_t);
+    return membuf+offset;
+}
 #define PRINT_PREFIX debug_
 static void debug_print_impl(const char*msg){
 	printf("%s",msg);
@@ -86,7 +90,7 @@ int main(int argc, char*argv[]){
     if (line)
         free(line);
 
-    int status = ssbl_main_loop(0,BUF_SIZE);
+    int status = ssbl_main(0,BUF_SIZE);
     if(status){
         printf("ERROR: sig mismatch\n");
     }else{

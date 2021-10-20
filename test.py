@@ -20,10 +20,12 @@ def testssbl(load_addr,ihex,key):
     subprocess.run(cmd,check=True)
 
 
-testssbl('0','testnostart.ihex','key512')
 
-for size in ['0x1FC','0x3FFC']:
-    for key in ['key512','key1024','key2048','key4096']:
+for key in ['key512','key1024','key2048','key4096']:
+    testssbl('0','testnostart.ihex',key)
+    print()
+
+    for size in ['0x1FC','0x3FFC']:
         test('0', size, 'test.ihex',key)
         print()
 

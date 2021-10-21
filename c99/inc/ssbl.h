@@ -72,12 +72,15 @@ static size_t ssbl_dat_reader(void*ctx, const void**dat){
             out=0;
             break;
     }
-    printf("dat_reader dat=%p, out=%lx\n",dat,out);
-    fflush(stdout);
+    //printf("dat_reader dat=%p, out=%lx\n",dat,out);
+    //fflush(stdout);
     return out;
 }
 
-int ssbl_main(uint64_t base, uint64_t size){
+int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
+    debug_println64x("INFO: base          0x",base);
+    debug_println64x("INFO: size          0x",size);
+    
     uint64_t sig[BN_WORDS64]={0};
     const uint64_t package_size = ssbl_read64();
     const uint64_t magic = ssbl_read64();
@@ -102,6 +105,8 @@ int ssbl_main(uint64_t base, uint64_t size){
     assert(size >= data_size);
     assert(base <= load_address);
     assert(base+size >= load_address+data_size);
+
+    debug_println("INFO: sanity checks passed");
 
     uint64_t*load_address_ptr = (uint64_t*)(uintptr_t)load_address;
 
@@ -133,7 +138,7 @@ int ssbl_main(uint64_t base, uint64_t size){
         debug_println("ERROR: sig mismatch, data erased");
         return -1;
     }else{
-        if(start_address+1){
+        if(call_allowed && (start_address+1)){
             debug_println64x("INFO: sig match, calling 0x",start_address);
             void (*target)(void) = (void (*)(void))(uintptr_t)start_address;
             target();
@@ -144,15 +149,16 @@ int ssbl_main(uint64_t base, uint64_t size){
     }
 }
 
-static int ssbl_main_loop(uint64_t base, uint64_t size){
-  int status = 0;
-  while(0<=status){//negative is fatal error
+static int ssbl_main_loop(uint64_t base, uint64_t size, bool call_allowed){
+    int status = 0;
     uint32_t errcode;
     if (0 == (errcode = setjmp(ssbl_exception_ctx))){
-      status = ssbl_main(base, size);
-    }else{
-      status = errcode;
+        while(0<=status){//negative is fatal error
+            status = ssbl_main(base, size, call_allowed);
+        }
+    } else {
+        status = errcode;
+        debug_println32x("ERROR: Exception caught by ssbl_main_loop 0x",status);
     }
-  }
-  return status;
+    return status;
 }

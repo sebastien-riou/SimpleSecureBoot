@@ -17,7 +17,7 @@ static void ssbl_mem_write64(uint64_t*addr, uint64_t dat){
     static unsigned int offset=0;
     uint64_t addr64 = (uint64_t)addr;
     if(0==offset) membuf_base = addr64;
-    printf("write %016lx at %08lx\n",dat,addr64);
+    //printf("write %016lx at %08lx\n",dat,addr64);
     assert(offset == (addr64-membuf_base)/sizeof(uint64_t));
     membuf[offset++] = dat;
 }
@@ -77,8 +77,7 @@ int main(int argc, char*argv[]){
             //printf("%s\n", hexstr);
             unsigned int nbytes = (read-12)/2;
             hexstr_to_bytes(dat,nbytes,hexstr);
-            if(dat-(uint8_t*)imagebuf < 128)
-                println_128("",dat);
+            //if(dat-(uint8_t*)imagebuf < 128) println_128("",dat);
             assert(dat-(uint8_t*)imagebuf + nbytes <= sizeof(imagebuf));
             dat+=nbytes;
         }else{
@@ -91,7 +90,7 @@ int main(int argc, char*argv[]){
     if (line)
         free(line);
 
-    int status = ssbl_main(0,BUF_SIZE);
+    int status = ssbl_main(0,1UL<<63,0); //BUF_SIZE);
     if(status){
         printf("ERROR: sig mismatch\n");
     }else{

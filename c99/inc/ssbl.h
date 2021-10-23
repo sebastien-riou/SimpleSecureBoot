@@ -77,7 +77,13 @@ static size_t ssbl_dat_reader(void*ctx, const void**dat){
     return out;
 }
 
-int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
+static bool ssbl_is_magic(uint64_t dat){
+    uint64_t expected_magic;
+    memcpy(&expected_magic,SSBL_MAGIC,sizeof(expected_magic));
+    return expected_magic == dat;
+}
+
+static int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
     debug_println64x("INFO: base          0x",base);
     debug_println64x("INFO: size          0x",size);
     

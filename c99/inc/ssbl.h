@@ -17,6 +17,13 @@ Image structure:
 //shall be declared by higher level file
 //static jmp_buf ssbl_exception_ctx;
 
+#ifndef SSBL_PREPARE_LOAD
+#define SSBL_PREPARE_LOAD()
+#endif
+#ifndef SSBL_PREPARE_CALL
+#define SSBL_PREPARE_CALL()
+#endif
+
 #ifndef SSBL_CUSTOM_IO
 static uint64_t ssbl_read64(){
     uint64_t out=0;
@@ -112,6 +119,7 @@ static int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
     assert(base <= load_address);
     assert(base+size >= load_address+data_size);
 
+    SSBL_PREPARE_LOAD();
     debug_println("INFO: sanity checks passed");
 
     uint64_t*load_address_ptr = (uint64_t*)(uintptr_t)load_address;
@@ -145,6 +153,7 @@ static int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
         return -1;
     }else{
         if(call_allowed && (start_address+1)){
+            SSBL_PREPARE_CALL();
             debug_println64x("INFO: sig match, calling 0x",start_address);
             void (*target)(void) = (void (*)(void))(uintptr_t)start_address;
             target();

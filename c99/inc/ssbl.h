@@ -147,6 +147,7 @@ static int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
     c.state=0;
     
     int status = ssb_check_sig(ssbl_dat_reader,&c,(BN_WORD*)sig);
+    ssbl_write32(status);
     if(status){
         memset(load_address_ptr,0,data_size);
         debug_println("ERROR: sig mismatch, data erased");
@@ -174,6 +175,7 @@ static int ssbl_main_loop(uint64_t base, uint64_t size, bool call_allowed){
     } else {
         status = errcode;
         debug_println32x("ERROR: Exception caught by ssbl_main_loop 0x",status);
+        ssbl_write32(errcode);
     }
     return status;
 }

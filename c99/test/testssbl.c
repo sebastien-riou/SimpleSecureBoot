@@ -11,6 +11,9 @@ static uint64_t ssbl_read64(){
     static unsigned int offset=0;
     return imagebuf[offset++];
 }
+static void ssbl_write32(uint32_t dat){
+    printf("SSBL WRITE32: 0x%08x\n",dat);
+}
 uint64_t membuf[BUF_SIZE];
 static uint64_t membuf_base=0;
 static void ssbl_mem_write64(uint64_t*addr, uint64_t dat){

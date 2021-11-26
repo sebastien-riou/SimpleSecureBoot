@@ -22,12 +22,17 @@ static int rsa_verify_pkcs1_15_sha256(
     unsigned int mp
 ){
     (void)bn_remove_unused_warnings;
-    BN_WORD x[BN_WORDS] = {0};
-    BN_WORD y[BN_WORDS] = {0};
+    #ifndef RSA_PKCS1_15_EXTXY
+    BN_WORD rsa_x[BN_WORDS] = {0};
+    BN_WORD rsa_y[BN_WORDS] = {0};
+    #endif
     BN_WORD safe_sig[BN_WORDS] = {0};
+    const unsigned int SIZEOFX = sizeof(safe_sig);
+    const unsigned int SIZEOFY = sizeof(safe_sig);
+    
     memcpy(safe_sig,sig,N_BYTE_LENGTH);
     
-    sha256_sum_callback(dat_reader,dat_reader_ctx,x);
+    sha256_sum_callback(dat_reader,dat_reader_ctx,rsa_x);
 
     const uint8_t pad[] = {
         0x20,0x04,0x00,0x05,
@@ -36,7 +41,7 @@ static int rsa_verify_pkcs1_15_sha256(
         0x60,0x09,0x06,0x0d,
         0x30,0x31,0x30,0x00,
     };
-    uint8_t*x8=(uint8_t*)x;
+    uint8_t*x8=(uint8_t*)rsa_x;
     memcpy(x8+DIGEST_LEN,pad,sizeof(pad));
     const unsigned int ffpadoffset = DIGEST_LEN+sizeof(pad);
     memset(x8+ffpadoffset,0xFF,N_BYTE_LENGTH-2-ffpadoffset);
@@ -48,14 +53,14 @@ static int rsa_verify_pkcs1_15_sha256(
         bn_dumphex("n=",n);
         bn_dumphex("sig=",safe_sig);
     #endif
-    bn_modexp_montgommery(y, safe_sig,e,n,R,R2,mp);
-    int status = memcmp(y,x,sizeof(y));
+    bn_modexp_montgommery(rsa_y, safe_sig,e,n,R,R2,mp);
+    int status = memcmp(rsa_y,rsa_x,SIZEOFY);
     #ifdef BN_MATH_DEBUG
-        bn_dumphex("y=",y);
+        bn_dumphex("y=",rsa_y);
         if(status){
             printf("sig mismatch:\n");
-            println_bytes("computed digest:  ",x,sizeof(x));
-            println_bytes("decrypted digest: ",y,sizeof(y));
+            println_bytes("computed digest:  ",rsa_x,SIZEOFX);
+            println_bytes("decrypted digest: ",rsa_y,SIZEOFY);
         }else{
             printf("sig match\n");
         }

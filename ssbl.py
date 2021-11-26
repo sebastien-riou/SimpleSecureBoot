@@ -81,7 +81,7 @@ for i in range(0,size):
     message_bytes.append(b)
     #print("%04X %02X "%(addr,b))
 
-message_bytes += bytes(dat_padlen)
+message_bytes += bytearray(bytes(dat_padlen))
 
 sig_bytes=RSA_SIGN_PKCS1_V1_5_SHA256(message_bytes,d,n)
 sig = int.from_bytes(sig_bytes,byteorder='little')
@@ -94,8 +94,10 @@ assert(bytes_length(n)==bytes_length(sig))
 #sanity check using python implementation
 RSA_VERIFY_PKCS1_V1_5_SHA256(message_bytes,sig_bytes,e,n)
 
-message_bytes += sig.to_bytes(bytes_length(n),byteorder='little')
-message_bytes += bytes(key_padlen+padlen)
+sig_bytes2 = bytearray(sig.to_bytes(bytes_length(n),byteorder='little'))
+message_bytes = bytearray(message_bytes)
+message_bytes += sig_bytes2
+message_bytes += bytearray(bytes(key_padlen+padlen))
 print(len(message_bytes))
 print(total_size)
 assert(len(message_bytes)==total_size)

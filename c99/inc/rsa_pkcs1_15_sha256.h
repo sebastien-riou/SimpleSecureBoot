@@ -29,7 +29,7 @@ static int rsa_verify_pkcs1_15_sha256(
     BN_WORD safe_sig[BN_WORDS] = {0};
     const unsigned int SIZEOFX = sizeof(safe_sig);
     const unsigned int SIZEOFY = sizeof(safe_sig);
-    
+    (void)SIZEOFX;
     memcpy(safe_sig,sig,N_BYTE_LENGTH);
     
     sha256_sum_callback(dat_reader,dat_reader_ctx,rsa_x);

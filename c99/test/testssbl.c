@@ -5,6 +5,13 @@
 #include <assert.h>
 #include <setjmp.h>
 
+void rng32_buf(void*dst,unsigned int size){
+    uint8_t*dst8 = (uint8_t*)dst;
+    for(unsigned int i=0;i<size;i++){
+        dst8[i] = rand();
+    }
+}
+
 #define SSBL_CUSTOM_IO
 uint64_t imagebuf[(BUF_SIZE+32+8+SSB_KEY_LENGTH/8)/8];
 static uint64_t ssbl_read64(){
@@ -53,6 +60,7 @@ static jmp_buf ssbl_exception_ctx;
 int main(int argc, char*argv[]){
     (void)bytes_utils_remove_unused_warnings;
     (void)default_dat_reader;
+
 
     if(argc<2) {
         printf("ERROR: need ihex file path as argument\n");

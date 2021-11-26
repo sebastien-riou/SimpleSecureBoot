@@ -136,8 +136,6 @@ static int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
     //debug_println64x("DEBUG: size          0x",size);
     uint64_t maska;
     uint64_t maskb;
-    uint64_t xred;
-    uint64_t yred;
     rng32_buf(&maska,sizeof(maska));
     uint64_t x_store[BN_WORDS64] = {0};
     uint64_t y_store[BN_WORDS64] = {0};

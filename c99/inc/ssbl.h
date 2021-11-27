@@ -157,6 +157,8 @@ static int ssbl_main(uint64_t base, uint64_t size, bool call_allowed){
     debug_println64x("INFO: load_address  0x",load_address);
     debug_println64x("INFO: start_address 0x",start_address);
     debug_println64x("INFO: data_size     0x",data_size);
+
+    if(0 == load_address+1) return 1;//image has been disabled, skip it.
             
     //sanity checks
     uint64_t expected_magic;

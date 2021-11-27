@@ -24,12 +24,13 @@ static void ssbl_write32(uint32_t dat){
 uint64_t membuf[BUF_SIZE];
 static uint64_t membuf_base=0;
 static void ssbl_mem_write64(uint64_t*addr, uint64_t dat){
-    static unsigned int offset=0;
+    static unsigned int ssbl_mem_write64_offset=0;
     uint64_t addr64 = (uint64_t)addr;
-    if(0==offset) membuf_base = addr64;
+    if(0==ssbl_mem_write64_offset) membuf_base = addr64;
+    if(membuf_base == addr64) ssbl_mem_write64_offset = 0;
     //printf("write %016lx at %08lx\n",dat,addr64);
-    assert(offset == (addr64-membuf_base)/sizeof(uint64_t));
-    membuf[offset++] = dat;
+    assert(ssbl_mem_write64_offset == (addr64-membuf_base)/sizeof(uint64_t));
+    membuf[ssbl_mem_write64_offset++] = dat;
 }
 static const uint64_t* const ssbl_mem_readbuf(const uint64_t*const addr){
     uint64_t addr64 = (uint64_t)addr;

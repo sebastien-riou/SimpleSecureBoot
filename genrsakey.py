@@ -8,6 +8,7 @@ import struct
 
 try:
     from Crypto import Random
+    from Crypto.Hash import SHA256
     from Crypto.IO import PKCS8, PEM
     from Crypto.Util.py3compat import tobytes, bord, tostr
     from Crypto.Util.asn1 import DerSequence
@@ -165,3 +166,11 @@ else:
 print("d=%d"%key.d)
 print("e=%d"%key.e)
 print("n=%d"%key.n)
+
+h = SHA256.new()
+b=key.d.to_bytes(bitlen//8,byteorder='little')
+h.update(b)
+
+digest_bytes=h.digest()
+digest=int.from_bytes( digest_bytes, byteorder='big')
+print("d_sha256=%d #(%032x)"%(digest,digest))
